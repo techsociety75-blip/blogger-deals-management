@@ -1,0 +1,29 @@
+{
+  "name": "blogger-deals-management",
+  "version": "1.0.0",
+  "description": "Blogger Deals & Budget Management System",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "build": "npm install",
+    "prebuild": "echo 'Building app...'",
+    "prestart": "echo 'Starting application...'"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "jsonwebtoken": "^9.0.0",
+    "dotenv": "^16.0.3",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
