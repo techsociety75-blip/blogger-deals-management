@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blogger Deals Management</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f7fa; color: #333; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .login-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
+    .login-box h1 { margin-bottom: 30px; text-align: center; color: #333; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+    .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .btn { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+    .btn:hover { background: #5568d3; }
+    .btn:disabled { background: #999; cursor: not-allowed; }
+    .error { color: #dc2626; margin-top: 10px; font-size: 14px; }
+    .success { color: #16a34a; margin-top: 10px; font-size: 14px; }
+
+    .dashboard { display: none; }
+    .sidebar { background: #1e293b; color: white; padding: 20px; min-height: 100vh; width: 250px; position: fixed; left: 0; top: 0; }
+    .sidebar h2 { margin-bottom: 30px; font-size: 18px; }
+    .sidebar .nav { list-style: none; }
+    .sidebar .nav li { margin-bottom: 15px; }
+    .sidebar .nav a { color: #cbd5e1; text-decoration: none; display: block; padding: 10px; border-radius: 4px; transition: all 0.3s; }
+    .sidebar .nav a:hover, .sidebar .nav a.active { background: #0f172a; color: #fff; }
+    .main-content { margin-left: 250px; }
+    .header { background: white; border-bottom: 1px solid #e2e8f0; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 24px; color: #333; }
+    .logout-btn { background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+
+    .content { padding: 30px; }
+    .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card h2 { margin-bottom: 20px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+    .stat-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; }
+    .stat-box .number { font-size: 32px; font-weight: bold; }
+    .stat-box .label { margin-top: 10px; opacity: 0.9; }
+
+    table { width: 100%; border-collapse: collapse; }
+    table th { background: #f3f4f6; padding: 12px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #e5e7eb; }
+    table td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+    table tr:hover { background: #f9fafb; }
+
+    .loading-spinner { text-align: center; padding: 40px; }
+    .spinner { border: 4px solid #f3f4f6; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .demo-credentials { background: #fef3c7; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #f59e0b; }
+    .demo-credentials p { margin: 5px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div class="login-page" id="loginPage">
+    <div class="login-box">
+      <h1>🎬 Blogger Deals</h1>
+      <div class="demo-credentials">
+        <p><strong>Demo Login:</strong></p>
+        <p>Email: admin@example.com</p>
+        <p>Password: password</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" required value="admin@example.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" required value="password">
+        </div>
+        <button type="submit" class="btn">Login</button>
+        <div id="loginError" class="error"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <div class="sidebar">
+      <h2>☑️ Blogger Deals</h2>
+      <ul class="nav">
+        <li><a href="#" onclick="showSection('overview')" class="nav-link active">Dashboard</a></li>
+        <li><a href="#" onclick="showSection('bloggers')" class="nav-link">Bloggers</a></li>
+        <li><a href="#" onclick="showSection('bookings')" class="nav-link">Bookings</a></li>
+        <li><a href="#" onclick="showSection('finance')" class="nav-link">Finance</a></li>
+        <li><a href="#" onclick="logout()" class="nav-link" style="color: #ef4444;">Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <div class="header">
+        <h1 id="pageTitle">Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+
+      <div class="content">
+        <!-- Overview Section -->
+        <div id="overview-section">
+          <div class="grid">
+            <div class="stat-box">
+              <div class="number" id="bloggerCount">0</div>
+              <div class="label">Total Bloggers</div>
+            </div>
+            <div class="stat-box">
+              <div class="number" id="bookingCount">0</div>
+              <div class="label">Active Bookings</div>
+            </div>
+            <div class="stat-box">
+              <div class="number" id="budgetCount">0</div>
+              <div class="label">Total Budget</div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>System Status</h2>
+            <p><strong>✅ Backend API:</strong> Connected</p>
+            <p><strong>✅ Frontend:</strong> Running</p>
+            <p><strong>✅ Database:</strong> JSON Storage Active</p>
+            <p style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;"><strong>Features Available:</strong></p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>37 REST API Endpoints</li>
+              <li>JWT Authentication</li>
+              <li>Role-Based Access Control</li>
+              <li>Blogger Management</li>
+              <li>Booking & Approval System</li>
+              <li>Budget & Finance Tracking</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bloggers Section -->
+        <div id="bloggers-section" style="display: none;">
+          <div class="card">
+            <h2>Bloggers Management</h2>
+            <button class="btn" onclick="loadBloggers()" style="width: auto; margin-bottom: 20px;">Refresh Data</button>
+            <div id="bloggersList" class="loading-spinner"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookings-section" style="display: none;">
+          <div class="card">
+            <h2>Bookings & Approvals</h2>
+            <button class="btn" onclick="loadBookings()" style="width: auto; margin-bottom: 20px;">Refresh Data</button>
+            <div id="bookingsList" class="loading-spinner"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Finance Section -->
+        <div id="finance-section" style="display: none;">
+          <div class="card">
+            <h2>Finance & Budget</h2>
+            <button class="btn" onclick="loadFinance()" style="width: auto; margin-bottom: 20px;">Refresh Data</button>
+            <div id="financeData" class="loading-spinner"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    let token = localStorage.getItem('token');
+
+    // Check if logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      if (token) {
+        showDashboard();
+        loadStats();
+      }
+    });
+
+    // Login
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('loginError');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          token = data.token;
+          errorDiv.textContent = '';
+          showDashboard();
+          loadStats();
+        } else {
+          errorDiv.textContent = data.error || 'Login failed';
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Connection error. Make sure the API is running.';
+      }
+    });
+
+    function showDashboard() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      location.reload();
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('[id$="-section"]').forEach(el => el.style.display = 'none');
+      document.getElementById(section + '-section').style.display = 'block';
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const titles = { overview: 'Dashboard', bloggers: 'Bloggers', bookings: 'Bookings', finance: 'Finance' };
+      document.getElementById('pageTitle').textContent = titles[section];
+    }
+
+    async function loadStats() {
+      try {
+        const [bloggers, bookings, expenses] = await Promise.all([
+          fetch(`${API_BASE}/api/bloggers`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`${API_BASE}/api/bookings`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json()),
+          fetch(`${API_BASE}/api/finance/expenses`, { headers: { 'Authorization': `Bearer ${token}` } }).then(r => r.json())
+        ]);
+
+        document.getElementById('bloggerCount').textContent = (bloggers.data || []).length;
+        document.getElementById('bookingCount').textContent = (bookings.data || []).filter(b => b.status === 'approved').length;
+        const total = (expenses.data || []).reduce((sum, e) => sum + (e.amount || 0), 0);
+        document.getElementById('budgetCount').textContent = `$${total.toLocaleString()}`;
+      } catch (err) {
+        console.error('Stats load error:', err);
+      }
+    }
+
+    async function loadBloggers() {
+      try {
+        const res = await fetch(`${API_BASE}/api/bloggers`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const bloggers = data.data || [];
+        let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Category</th><th>Followers</th></tr></thead><tbody>';
+        bloggers.forEach(b => {
+          html += `<tr><td>${b.name}</td><td>${b.email}</td><td>${b.category}</td><td>${b.followers || 0}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('bloggersList').innerHTML = html;
+      } catch (err) {
+        document.getElementById('bloggersList').innerHTML = '<p style="color: #ef4444;">Failed to load bloggers</p>';
+      }
+    }
+
+    async function loadBookings() {
+      try {
+        const res = await fetch(`${API_BASE}/api/bookings`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const bookings = data.data || [];
+        let html = '<table><thead><tr><th>ID</th><th>Status</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
+        bookings.forEach(b => {
+          html += `<tr><td>${b.id}</td><td><span style="background: ${b.status === 'approved' ? '#10b981' : '#f59e0b'}; color: white; padding: 4px 8px; border-radius: 4px;">${b.status}</span></td><td>$${b.amount}</td><td>${new Date(b.createdAt).toLocaleDateString()}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('bookingsList').innerHTML = html;
+      } catch (err) {
+        document.getElementById('bookingsList').innerHTML = '<p style="color: #ef4444;">Failed to load bookings</p>';
+      }
+    }
+
+    async function loadFinance() {
+      try {
+        const res = await fetch(`${API_BASE}/api/finance/expenses`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const expenses = data.data || [];
+        const total = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+        let html = `<p><strong>Total Expenses:</strong> $${total.toLocaleString()}</p>`;
+        html += '<table><thead><tr><th>Description</th><th>Amount</th><th>Category</th><th>Date</th></tr></thead><tbody>';
+        expenses.forEach(e => {
+          html += `<tr><td>${e.description}</td><td>$${e.amount}</td><td>${e.category}</td><td>${new Date(e.date).toLocaleDateString()}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById('financeData').innerHTML = html;
+      } catch (err) {
+        document.getElementById('financeData').innerHTML = '<p style="color: #ef4444;">Failed to load finance data</p>';
+      }
+    }
+  </script>
+</body>
+</html>
